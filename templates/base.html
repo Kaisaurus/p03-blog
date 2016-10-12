@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="/static/bootstrap.min.css" rel="stylesheet">
+  <title>Base HTML file</title>
+  <style type="text/css" media="screen">
+  .error {
+    color: red;
+  }
+  .navbar-collapse {
+    padding-left: 0;
+  }
+  </style>
+</head>
+<body>
+<div class="container">
+  <a href="/" title="">
+    <h1 class="text-center">Kai's Simple Blog Test</h1>
+  </a>
+  <nav class="navbar navbar-default">
+  <!-- nav class="btn-group btn-group-justified"> -->
+    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar-collapse-1" aria-expanded="false">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li>
+          <a href="/">View posts</a>
+        </li>
+        <li>
+          <a href="/blog/newpost">New Post</a>
+        </li>
+        <li>
+          <a href="/signup">Sign up</a>
+        </li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        {% if user %}
+          <li class="navbar-text">Logged in as
+            <strong>{{ user.name }}</strong>
+          </li>
+          <li>
+            <a href="/logout">Logout</a>
+          </li>
+        {% else %}
+
+          <li>
+            <a href="/login">Login </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </nav>
+
+  {% block content %}
+  {% endblock %}
+</div>
+
+<script type="text/javascript" src="/static/jquery-3.1.1.min.js"></script>
+<script type="text/javascript" src="/static/bootstrap.min.js"></script>
+</body>
+</html>

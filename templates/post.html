@@ -1,0 +1,29 @@
+<div class="post">
+  <div class="post-heading">
+    <h3>
+      {{p.subject}}
+    </h3>
+
+    <div class="post-date">
+      Posted on
+      {{p.created.strftime("%b %d, %Y")}}
+      by
+      {{p.username}}
+    </div>
+  </div>
+
+  <div class="well">
+    {{p._render_text | safe}}
+  </div>
+  <div>
+    {{ p.count_likes() }}
+    {% if current_user %}
+      {% if p.username == current_user.name %}
+        <a class="btn-success btn disabled">Like</a>
+      {% else %}
+        <a class="btn-success btn">Like</a>
+      {% endif %}
+
+    {% endif %}
+  </div>
+</div>

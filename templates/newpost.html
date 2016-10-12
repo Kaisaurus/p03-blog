@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="col-lg-6">
+  <form class="form-horizontal" method="post">
+    <fieldset>
+      <legend class="text-center"><h2>New Post</h2></legend>
+      <div class="form-group">
+        <label class="col-lg-2 control-label">Username</label>
+        <div class="col-lg-10">
+          <input type="text" class="form-control" name="subject" placeholder="Subject" value="{{subject}}" autocomplete="off">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-2 control-label">Username</label>
+        <div class="col-lg-10">
+          <textarea class="form-control" name="content" placeholder="Content" autocomplete="off">{{content}}</textarea>
+        </div>
+      </div>
+      <div class="col-lg-12 error text-right">
+        <p>{{error}}</p>
+      </div>
+      <div class="form-group">
+        <div class="col-lg-12 text-right">
+          <button type="reset" class="btn btn-danger">Reset</button>
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+      </div>
+    </fieldset>
+  </form>
+</div>
+<div class="col-lg-6">
+{% if user_posts %}
+  {% for p in user_posts %}
+    {{ p.render() | safe }}
+    <br><br>
+  {% endfor %}
+{% endif %}
+</div>
+{% endblock %}

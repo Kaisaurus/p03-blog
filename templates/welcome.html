@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h2>Welcome, {{ user.name }}!</h2>
+  <p>
+    You can now
+    <a href="/blog/newpost" title="create blog post">
+    create blog posts
+    </a>
+    and
+    <a href="/" title="read blog posts">
+    like posts from other people
+    </a>
+    .
+  </p>
+{% endblock %}
