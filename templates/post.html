@@ -16,14 +16,16 @@
     {{p._render_text | safe}}
   </div>
   <div>
-    {{ p.count_likes() }}
+    {{ p.count_likes() }} Likes
+
     {% if current_user %}
       {% if p.username == current_user.name %}
         <a class="btn-success btn disabled">Like</a>
       {% else %}
-        <a class="btn-success btn">Like</a>
+        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}">Like</a>
       {% endif %}
 
     {% endif %}
+    <span class="error"> {{error}}<span>
   </div>
 </div>
