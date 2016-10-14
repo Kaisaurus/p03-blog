@@ -8,7 +8,13 @@
       Posted on
       {{p.created.strftime("%b %d, %Y")}}
       by
-      {{p.username}}
+      {% if p.username == current_user.name %}
+        <strong>
+        Me, Myself and I
+        </strong>
+      {% else %}
+        {{p.username}}
+      {% endif %}
     </div>
   </div>
 
@@ -16,14 +22,26 @@
     {{p._render_text | safe}}
   </div>
   <div>
-    {{ p.count_likes() }}
+    <span class="likes_counter">{{ p.count_likes() }}</span>
+    Likes
+
     {% if current_user %}
       {% if p.username == current_user.name %}
-        <a class="btn-success btn disabled">Like</a>
-      {% else %}
-        <a class="btn-success btn">Like</a>
-      {% endif %}
 
+      {% elif current_user.key.id() in p.liked_by %}
+        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}"><span class="ladida">Unlike</span></a>
+      {% else %}
+        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}"><span class="ladida">Like</span></a>
+      {% endif %}
+    {% else %}
+      (<a href="/login" title="Login">Login
+      </a>
+      or
+      <a href="/signup" title="Sign up">
+      Sign up
+      </a>
+      to Like this post)
     {% endif %}
+    <span class="error"> {{error}}<span>
   </div>
 </div>
