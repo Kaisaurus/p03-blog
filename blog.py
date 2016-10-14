@@ -6,6 +6,7 @@ import hmac
 import json
 from string import letters
 
+
 import webapp2
 import jinja2
 
@@ -254,7 +255,7 @@ class Post(ndb.Model):
 
   def render(self, current_user):
     self._render_text = self.content.replace('\n', '<br>')
-    return render_str_jinja("post.html", p = self, current_user=current_user)
+    return render_str_jinja("post.html", p=self, current_user=current_user)
 
   def count_likes(self):
     return len(self.liked_by)
@@ -271,12 +272,9 @@ class Post(ndb.Model):
   def by_name(cls, name):
     return cls.query(cls.username == name).fetch()
 
-    #u = Post.all().filter('username =', name).get()
-    #return u
-
   @classmethod
   def by_id(cls, post_id):
-    return Post.get_by_id(post_id, parent=blog_key())
+    return Post.get_by_id(int(post_id), parent=blog_key())
 
 class BlogFront(BlogHandler):
   def get(self):
@@ -324,61 +322,30 @@ class NewPost(BlogHandler):
 
 class LikePost(BlogHandler):
   def post(self):
-
     if not self.user:
-      self.write(json.dumps(({'msg': 'error123'})))
+      self.redirect('/')
 
-    msg = "yo"
-    self.write(json.dumps({'msg': msg}))
-    post_id = int(self.request.get('post_id'))
-    # retrieve post entity from datastore
-    #post = Post.get_by_id(post_id)
-    post = Post.by_id(post_id)
-    # retrieve user id from initialise method
-    user_id = self.user.key.id()
-    user_name = self.user.name
+    post = Post.by_id(self.request.get('post_id'))
 
-    msg = post.likes
-    self.write(json.dumps({'msg': msg}))
-'''
-    if user_name == post.username:
-      error = "You can not add a  'like' to your own posts"
-      self.write(json.dumps({'msg': error}))
-
-    elif user_id in post.likes:
-      error = "You can't like this twice"
-      self.write(json.dumps({'msg': error}))
-
+    if self.user.name == post.username:
+      # this shouldn't ever happen since the button shouldn't appear for same user posts. But just in case someone tries something funny..
+      self.redirect('/')
     else:
-      post.likes.append(str(user_id))
-      self.user.likes.append(post.key().id())
-      self.write(json.dumps({'msg': post.count_likes()}))
+      # retrieve user id from initialise method
+      user_id = self.user.key.id()
+
+      if user_id in post.liked_by:
+        post.liked_by.remove(user_id)
+        self.user.likes.remove(post.key.id())
+        self.write(json.dumps({'like_btn_txt':'Like','likes_counter': post.count_likes()}))
+
+      else:
+        post.liked_by.append(int(user_id))
+        self.user.likes.append(int(post.key.id()))
+        self.write(json.dumps({'likes_counter': post.count_likes(),'like_btn_txt':'Unlike'}))
 
       post.put()
       self.user.put()
-'''
-'''
-    msg = post.username
-    self.write(json.dumps({'msg': msg}))
-
-      self.user.likes.remove(post.key.id())
-      self.write(json.dumps(({'likes': post.likes, 'you-like': ''})))
-      post.put()
-      self.user.put()
-    else:
-      post.likes += 1
-      post.liked_by.append(uid)
-      self.user.likes.append(post.key.id())
-      self.write(json.dumps(({'likes': post.likes, 'you-like': ' You like this'})))
-      post.put()
-      self.user.put()
-
-
-    msg = "hey"+str(user_id+post_id)
-    self.write(json.dumps({'msg': msg}))
-'''
-
-
 
 
 app = webapp2.WSGIApplication([('/', BlogFront),
