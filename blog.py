@@ -4,9 +4,12 @@ import random
 import hashlib
 import hmac
 import json
+import datetime
 from string import letters
 
-
+''' work in progress
+from handlers.bloghandler import GeneralHandler
+'''
 import webapp2
 import jinja2
 
@@ -46,6 +49,16 @@ def valid_pw(name, password, h):
 
 def users_key(group = 'default'):
   return ndb.Key('users', group)
+
+def render_post(response, post):
+  response.out.write('<b>' + post.subject + '</b><br>')
+  response.out.write(post.content)
+
+def blog_key(name = 'default'):
+  return ndb.Key('blogs', name)
+
+def error_page(handler, error):
+  handler.render('error.html', error=error)
 
 
 class BlogHandler(webapp2.RequestHandler):
@@ -90,10 +103,6 @@ class BlogHandler(webapp2.RequestHandler):
       self.user = uid
     '''
 
-def render_post(response, post):
-  response.out.write('<b>' + post.subject + '</b><br>')
-  response.out.write(post.content)
-
 class User(ndb.Model):
   name = ndb.StringProperty(required = True)
   pw_hash = ndb.StringProperty(required = True)
@@ -126,19 +135,11 @@ class User(ndb.Model):
     if u and valid_pw(name, pw, u.pw_hash):
       return u
 
+
 class Signup(BlogHandler):
   def get(self):
-    #users = User.all().order('-created')
     users = User.query().order(-User.created)
     self.render("signup-form.html", users=users)
-
-
-    '''
-    e = Post.query()
-    e = e.order(-Post.created)
-    entries = e.fetch(n)
-    return entries
-    '''
 
   def post(self):
     have_error = False
@@ -173,6 +174,7 @@ class Signup(BlogHandler):
   def done(self, *a, **kw):
     raise NotImplementedError
 
+
 class Register(Signup):
   def done(self):
     #make sure the user doesn't already exist
@@ -186,6 +188,7 @@ class Register(Signup):
 
       self.login_cookie(u)
       self.redirect('/welcome')
+
 
 class Login(BlogHandler):
   def get(self):
@@ -215,16 +218,6 @@ class Welcome(BlogHandler):
       self.render('welcome.html')
     else:
       self.redirect('/signup')
-'''
-class Welcome(BlogHandler):
-  def get(self):
-    username = self.request.get('username')
-    if valid_username(username):
-      self.render('welcome.html', username = username)
-    else:
-      self.redirect('/signup')
-
-'''
 
 USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
 def valid_username(username):
@@ -238,20 +231,13 @@ EMAIL_RE  = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
 def valid_email(email):
   return not email or EMAIL_RE.match(email)
 
-
-##### blog stuff
-
-def blog_key(name = 'default'):
-  #return ndb.Key.from_path('blogs', name)
-  return ndb.Key('blogs', name)
-
 class Post(ndb.Model):
   subject = ndb.StringProperty(required = True)
   content = ndb.TextProperty(required = True)
   username = ndb.StringProperty(required=True)
-  created = ndb.DateTimeProperty(auto_now_add = True)
   liked_by = ndb.IntegerProperty(repeated=True)
-  last_modified = ndb.DateTimeProperty(auto_now = True)
+  last_modified = ndb.DateTimeProperty(auto_now=True)
+  liked_by = ndb.IntegerProperty(repeated=True)
 
   def render(self, current_user):
     self._render_text = self.content.replace('\n', '<br>')
@@ -260,11 +246,10 @@ class Post(ndb.Model):
   def count_likes(self):
     return len(self.liked_by)
 
-# get blog posts
   @classmethod
   def get_entries(cls, n=10):
     e = Post.query()
-    e = e.order(-Post.created)
+    e = e.order(-Post.last_modified)
     entries = e.fetch(n)
     return entries
 
@@ -276,37 +261,39 @@ class Post(ndb.Model):
   def by_id(cls, post_id):
     return Post.get_by_id(int(post_id), parent=blog_key())
 
+
 class BlogFront(BlogHandler):
   def get(self):
     posts = Post.get_entries(100)
     self.render('front.html', posts=posts)
 
+
 class PostPage(BlogHandler):
   def get(self, post_id):
-    #key = ndb.Key.from_path('Post', int(post_id), parent=blog_key())
-    #post = ndb.get(key)
-    #post = Post.get_by_id(int(post_id))
+
     post = Post.by_id(post_id)
 
-    if not post:
-      self.render('error.html', error="This post doesn't exist")
-      #self.error(404)
-      return
+    if post:
+      self.render("permalink.html", post=post)
+    else:
+      error = "Could not retrieve requested post"
+      error_page(self, error=error)
 
-    self.render("permalink.html", post = post)
 
 class NewPost(BlogHandler):
   def get(self):
+
     if self.user:
       user_posts = Post.by_name(self.user.name)
-
       self.render("newpost.html", user_posts=user_posts)
     else:
       self.redirect("/login")
 
   def post(self):
     if not self.user:
-      self.redirect('/')
+      error = "Looks like something went wrong, that action is not allowed when not logged in."
+      error_page(self, error=error)
+      return
 
     subject = self.request.get('subject')
     content = self.request.get('content')
@@ -320,16 +307,18 @@ class NewPost(BlogHandler):
       error = "What kind of blog post doesn't have a subject and content? Get working!"
       self.render("newpost.html", subject=subject, content=content, error=error)
 
+
 class LikePost(BlogHandler):
   def post(self):
+
     if not self.user:
-      self.redirect('/')
+      self.write(json.dumps({'msg':"You must be logged in to 'Like' a post."}))
 
     post = Post.by_id(self.request.get('post_id'))
 
     if self.user.name == post.username:
       # this shouldn't ever happen since the button shouldn't appear for same user posts. But just in case someone tries something funny..
-      self.redirect('/')
+      self.write(json.dumps({'msg':'You cannot like your own post.'}))
     else:
       # retrieve user id from initialise method
       user_id = self.user.key.id()
@@ -347,6 +336,28 @@ class LikePost(BlogHandler):
       post.put()
       self.user.put()
 
+class DeletePost(BlogHandler):
+  def post(self):
+    post = Post.by_id(self.request.get('post_id'))
+
+    if self.user.name == post.username:
+      post.key.delete()
+      self.write(json.dumps({'msg':'deleted'}))
+    else:
+      self.write(json.dumps({'msg':"You are not allowed to delete someone else's post"}))
+
+class EditPost(BlogHandler):
+  def post(self):
+    post = Post.by_id(self.request.get('post_id'))
+
+    if self.user.name == post.username:
+      post.subject = self.request.get('post_subject')
+      post.content = self.request.get('post_content')
+      post.put()
+      self.write(json.dumps({'datetime':post.last_modified.strftime("%b %d, %Y - %H:%M")}))
+    else:
+      self.write(json.dumps({'msg':"You are not allowed to edit someone else's post"}))
+
 
 app = webapp2.WSGIApplication([('/', BlogFront),
                  ('/welcome', Welcome),
@@ -354,6 +365,8 @@ app = webapp2.WSGIApplication([('/', BlogFront),
                  ('/blog/([0-9]+)', PostPage),
                  ('/blog/newpost', NewPost),
                  ('/blog/like', LikePost),
+                 ('/blog/delete', DeletePost),
+                 ('/blog/edit', EditPost),
                  ('/signup', Register),
                  ('/login', Login),
                  ('/logout', Logout)

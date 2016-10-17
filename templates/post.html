@@ -1,12 +1,11 @@
 <div class="post">
   <div class="post-heading">
-    <h3>
-      {{p.subject}}
-    </h3>
+    <h3 class="post-subject">{{p.subject}}</h3>
 
-    <div class="post-date">
-      Posted on
-      {{p.created.strftime("%b %d, %Y")}}
+    <p>
+      <span class="post-datetime">
+      {{p.last_modified.strftime("%b %d, %Y - %H:%M")}}
+      </span>
       by
       {% if p.username == current_user.name %}
         <strong>
@@ -15,23 +14,42 @@
       {% else %}
         {{p.username}}
       {% endif %}
-    </div>
+    </p>
   </div>
-
-  <div class="well">
-    {{p._render_text | safe}}
-  </div>
-  <div>
+  <div class="well post-content">{{p._render_text | safe}}</div>
+  <div class="post-btns">
     <span class="likes_counter">{{ p.count_likes() }}</span>
     Likes
 
     {% if current_user %}
       {% if p.username == current_user.name %}
-
+        <a href="#" data-key="{{p.key.id()}}" class="edit btn btn-sm btn-primary">
+        edit
+        </a>
+        <span class="edit-prompt hidden">
+          <a href="#" data-key="{{p.key.id()}}" class="edit-yes btn btn-sm btn-success" title="submit edited post">
+          submit
+          </a>
+          <a href="#" class="edit-no btn btn-sm btn-danger" title="cancel edit">
+          cancel
+          </a>
+        </span>
+        <a href="#" class="delete btn btn-sm btn-default">
+        delete
+        </a>
+        <span class="delete-prompt hidden">
+          Are you sure you want to delete?
+          <a href="#" data-key="{{p.key.id()}}" class="delete-yes btn btn-sm btn-danger" title="This will permanently delete this post">
+          delete
+          </a>
+          <a href="#" class="delete-no btn btn-sm btn-link">
+          cancel
+          </a>
+        </span>
       {% elif current_user.key.id() in p.liked_by %}
-        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}"><span class="ladida">Unlike</span></a>
+        <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Unlike</a>
       {% else %}
-        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}"><span class="ladida">Like</span></a>
+        <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Like</a>
       {% endif %}
     {% else %}
       (<a href="/login" title="Login">Login
