@@ -1,0 +1,35 @@
+<div class="comment row">
+  <div class="col-lg-4 text-center">
+    <span class="glyphicon glyphicon-user icon-comment-user" aria-hidden="true"></span>
+    <br>
+    {{ c.username }}
+    <br>
+    <small class="comment-datetime">
+      {{ c.last_modified.strftime("%b %d, %Y - %H:%M") }}
+    </small>
+    <p>
+      {% if c.username == current_user.name %}
+        <a href="#" class="edit-comment ">
+        Edit
+        </a>
+        <span class="edit-prompt hidden">
+          <a href="#" data-key="{{c.key.id()}}" class="edit-yes btn btn-sm btn-success" title="submit edited post">
+          Submit
+          </a>
+          <a href="#" class="edit-no btn btn-sm btn-danger" title="cancel edit">
+          Cancel
+          </a>
+        </span>
+        <a href="#" data-key="{{c.key.id()}}" class="delete-comment ">
+        Delete
+        </a>
+        <span class="error"></span>
+      {% endif %}
+    </p>
+  </div>
+  <div class="col-lg-8">
+    <div class="well">
+      <p class="comment-content">{{ c._render_text | safe }}</p>
+    </div>
+  </div>
+</div>
