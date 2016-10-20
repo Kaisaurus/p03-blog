@@ -2,13 +2,13 @@
   <div class="col-lg-4 text-center">
     <span class="glyphicon glyphicon-user icon-comment-user" aria-hidden="true"></span>
     <br>
-    {{ c.username }}
+    {{ c.user_name }}
     <br>
     <small class="comment-datetime">
       {{ c.last_modified.strftime("%b %d, %Y - %H:%M") }}
     </small>
     <p>
-      {% if c.username == current_user.name %}
+      {% if c.username == current_user %}
         <a href="#" class="edit-comment ">
         Edit
         </a>

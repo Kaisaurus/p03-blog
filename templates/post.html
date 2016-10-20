@@ -6,7 +6,7 @@
       {{p.last_modified.strftime("%b %d, %Y - %H:%M")}}
       </span>
       by
-      {% if p.username == current_user.name %}
+      {% if p.username == current_user %}
         <strong>
         Me, Myself and I
         </strong>
@@ -24,7 +24,7 @@
       Likes
 
       {% if current_user %}
-        {% if p.username == current_user.name %}
+        {% if p.username == current_user %}
           <a href="#" data-key="{{p.key.id()}}" class="edit btn btn-sm btn-primary">
           Edit
           </a>
@@ -48,7 +48,7 @@
             Cancel
             </a>
           </div>
-        {% elif current_user.key.id() in p.liked_by %}
+        {% elif current_user in p.liked_by %}
           <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Unlike</a>
         {% else %}
           <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Like</a>
