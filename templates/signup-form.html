@@ -11,7 +11,7 @@
           <input type="text" class="form-control" id="inputUsername" name="username" placeholder="Username" value="{{username}}" autocomplete="off">
         </div>
         <div class="col-lg-4 error">
-          {{error_username}}
+          {{ error_username }}
         </div>
       </div>
       <div class="form-group">
@@ -20,7 +20,7 @@
           <input type="password" class="form-control" id="inputPassword" name="password" placeholder="Password" autocomplete="off">
         </div>
         <div class="col-lg-4 error">
-          {{error_password}}
+          {{ error_password }}
         </div>
       </div>
       <div class="form-group">
@@ -29,7 +29,7 @@
           <input type="password" class="form-control" name="verify" id="inputPassword" placeholder="Password" autocomplete="off">
         </div>
         <div class="col-lg-4 error">
-          {{error_verify}}
+          {{ error_verify }}
         </div>
       </div>
       <div class="form-group">
@@ -38,7 +38,7 @@
           <input type="text" class="form-control" id="inputEmail" name="email" value="{{email}}" placeholder="Email">
         </div>
         <div class="col-lg-4 error">
-          {{error_email}}
+          {{ error_email }}
         </div>
       </div>
       <div class="form-group">
@@ -51,23 +51,6 @@
   </form>
 </div>
 <div class="col-lg-5">
-  <table class="table table-striped table-bordered">
-    <caption>Existing users</caption>
-    <thead>
-      <tr>
-        <th>name</th>
-        <th>pw</th>
-        <th>date</th>
-      </tr>
-    </thead>
-    {% for user in users %}
-    <tbody>
-      <tr>
-        <td>{{ user.name }}</td>
-        <td>{{ user.created.strftime("%b %d, %Y")}}</td>
-      </tr>
-    </tbody>
-    {% endfor %}
-  </table>
+
 </div>
 {% endblock %}

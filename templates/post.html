@@ -1,47 +1,88 @@
-<div class="post">
-  <div class="post-heading">
-    <h3>
-      {{p.subject}}
-    </h3>
-
-    <div class="post-date">
-      Posted on
-      {{p.created.strftime("%b %d, %Y")}}
+<div class="post row">
+  <div class="post-heading col-lg-12">
+    <h3 class="post-subject">{{p.subject}}</h3>
+    <p>
+      <span class="post-datetime">
+      {{p.last_modified.strftime("%b %d, %Y - %H:%M")}}
+      </span>
       by
-      {% if p.username == current_user.name %}
+      {% if p.user_name == user_name %}
         <strong>
         Me, Myself and I
         </strong>
       {% else %}
-        {{p.username}}
+        {{p.user_name}}
       {% endif %}
+    </p>
+  </div>
+  <div class="well col-lg-12 ">
+    <div class="post-content">
+    {{p._render_text | safe}}
+    </div>
+    <div class="post-btns text-right">
+      <span class="likes_counter">{{ p.count_likes() }}</span>
+      Likes
+
+      {% if user_name %}
+        {% if p.user_name == user_name %}
+          <a href="#" data-key="{{p.key.id()}}" class="edit btn btn-sm btn-primary">
+          Edit
+          </a>
+          <span class="edit-prompt hidden">
+            <a href="#" data-key="{{p.key.id()}}" class="edit-yes btn btn-sm btn-success" title="submit edited post">
+            Submit
+            </a>
+            <a href="#" class="edit-no btn btn-sm btn-danger" title="cancel edit">
+            Cancel
+            </a>
+          </span>
+          <a href="#" class="delete btn btn-sm btn-default">
+          Delete
+          </a>
+          <div class="delete-prompt hidden">
+            Are you sure you want to delete?
+            <a href="#" data-key="{{p.key.id()}}" class="delete-yes btn btn-sm btn-danger" title="This will permanently delete this post">
+            Delete
+            </a>
+            <a href="#" class="delete-no btn btn-sm btn-link">
+            Cancel
+            </a>
+          </div>
+        {% elif user_name in p.liked_by %}
+          <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Unlike</a>
+        {% else %}
+          <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Like</a>
+        {% endif %}
+      {% else %}
+        (<a href="/login" title="Login">Login
+        </a>
+        or
+        <a href="/signup" title="Sign up">
+        Sign up
+        </a>
+        to Like or Comment on this post)
+      {% endif %}
+      <span class="error"> {{error}}<span>
     </div>
   </div>
-
-  <div class="well">
-    {{p._render_text | safe}}
-  </div>
-  <div>
-    <span class="likes_counter">{{ p.count_likes() }}</span>
-    Likes
-
-    {% if current_user %}
-      {% if p.username == current_user.name %}
-
-      {% elif current_user.key.id() in p.liked_by %}
-        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}"><span class="ladida">Unlike</span></a>
-      {% else %}
-        <a href="#" class="like btn btn-success" data-key="{{p.key.id()}}"><span class="ladida">Like</span></a>
+  <div class="post-comments col-lg-9">
+    <div class="col-lg-12 comments">
+      {% if comments %}
+        {% for c in comments %}
+          {{ c.render(user_name) | safe }}
+        {% endfor %}
       {% endif %}
-    {% else %}
-      (<a href="/login" title="Login">Login
-      </a>
-      or
-      <a href="/signup" title="Sign up">
-      Sign up
-      </a>
-      to Like this post)
+    </div>
+    {% if user_name %}
+    <div class="col-lg-12 panel panel-body">
+      <a href="#" class="comment-btn col-lg-12">add a comment...</a>
+      <div class="comment-add  hidden text-right">
+        <textarea class="comment-text"></textarea>
+        <a href="#" class="comment-no btn btn-link btn-md">Cancel</a>
+        <a href="#" data-key="{{p.key.id()}}" class="comment-yes btn-default btn btn-md">Post</a>
+      </div>
+      <span class="error"></span>
+    </div>
     {% endif %}
-    <span class="error"> {{error}}<span>
   </div>
 </div>
