@@ -6,12 +6,12 @@
       {{p.last_modified.strftime("%b %d, %Y - %H:%M")}}
       </span>
       by
-      {% if p.username == current_user %}
+      {% if p.user_name == user_name %}
         <strong>
         Me, Myself and I
         </strong>
       {% else %}
-        {{p.username}}
+        {{p.user_name}}
       {% endif %}
     </p>
   </div>
@@ -23,8 +23,8 @@
       <span class="likes_counter">{{ p.count_likes() }}</span>
       Likes
 
-      {% if current_user %}
-        {% if p.username == current_user %}
+      {% if user_name %}
+        {% if p.user_name == user_name %}
           <a href="#" data-key="{{p.key.id()}}" class="edit btn btn-sm btn-primary">
           Edit
           </a>
@@ -48,7 +48,7 @@
             Cancel
             </a>
           </div>
-        {% elif current_user in p.liked_by %}
+        {% elif user_name in p.liked_by %}
           <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Unlike</a>
         {% else %}
           <a href="#" class="like btn-sm btn btn-success" data-key="{{p.key.id()}}">Like</a>
@@ -69,11 +69,11 @@
     <div class="col-lg-12 comments">
       {% if comments %}
         {% for c in comments %}
-          {{ c.render(current_user) | safe }}
+          {{ c.render(user_name) | safe }}
         {% endfor %}
       {% endif %}
     </div>
-    {% if current_user %}
+    {% if user_name %}
     <div class="col-lg-12 panel panel-body">
       <a href="#" class="comment-btn col-lg-12">add a comment...</a>
       <div class="comment-add  hidden text-right">

@@ -1,27 +1,36 @@
 h1{
   font-family: 'Bungee Inline', cursive;
 }
-h3{
+
+h3, .post-subject{
   font-family: 'Coming Soon', cursive;
   font-size: 42px;
+  height: 62px;
 }
+
+textarea{
+  min-height: 30px;
+  width: 100%;
+}
+
 .error {
   color: red;
 }
+
 .navbar-collapse {
   padding-left: 0;
 }
+
 .post{
   padding-bottom: 30px;
   border-bottom: 1px solid rgba(0,0,0,0.3);
   margin-bottom: 10px;
 }
-.post-content textarea, .post-comments textarea{
-  width: 100%;
-}
+
 .unclickable{
   cursor: default;
 }
+
 .comment-user{
   height: 45px;
   width: 45px;

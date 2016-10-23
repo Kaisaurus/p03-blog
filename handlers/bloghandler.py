@@ -11,14 +11,10 @@ class BlogHandler(webapp2.RequestHandler):
     def write(self, *a, **params):
         self.response.out.write(*a, **params)
 
-    # TO BE DELETED
-    def render_str(self, template, **params):
-        params['user'] = self.user.name
-        return helpers.render_str_jinja(template, **params)
-
     # render a page using jinja and passing the current user as 'user' param so it is avialable in all templates
     def render(self, template, **params):
-        params['user'] = self.user.name
+        if self.user:
+            params['user_name'] = self.user.name
         self.write(helpers.render_str_jinja(template, **params))
 
     # general function to set a secure cookie
@@ -45,7 +41,7 @@ class BlogHandler(webapp2.RequestHandler):
     # get blog posts
     def get_entries(self, n=10):
         e = Post.query()
-        e = e.order(-Post.created)
+        e = e.order(-Post.last_modified)
         entries = e.fetch(n)
         return entries
 
@@ -54,4 +50,4 @@ class BlogHandler(webapp2.RequestHandler):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
         # if the user is set, makes it available to all children Classes by assigning it to attribute user
-        self.user = uid and User.by_id(int(uid))
+        self.user = uid and User.get_by_id(int(uid))

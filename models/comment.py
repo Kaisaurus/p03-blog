@@ -4,20 +4,20 @@ from google.appengine.ext import ndb
 from handlers import helpers
 
 class Comment(ndb.Model):
+    # Comment properties
     post_id = ndb.IntegerProperty()
-    user_name = ndb.IntegerProperty(required=True)
+    user_name = ndb.StringProperty(required=True)
     comment = ndb.TextProperty(required=True)
     liked_by = ndb.IntegerProperty(repeated=True)
     last_modified = ndb.DateTimeProperty(auto_now=True)
 
-    def render(self, current_user):
+    # render a comment using the comment.html template
+    def render(self, user_name):
         self._render_text = self.comment.replace('\n', '<br>')
-        return helpers.render_str_jinja("comment.html", c=self, username=self.user_name , current_user=current_user)
+        # the current user name and the comment is passed to the template
+        return helpers.render_str_jinja("comment.html", c=self, user_name=user_name)
 
-    def count_likes(self):
-        #returns like count
-        return len(self.liked_by)
-
+    # returns all comments by post_id of the post they belong to
     @classmethod
     def by_post_id(cls, post_id):
-        return cls.query(cls.post_id == post_id).fetch()
+        return cls.query(cls.post_id==int(post_id)).fetch()

@@ -8,11 +8,6 @@ class User(ndb.Model):
     likes = ndb.IntegerProperty(repeated=True)
     email = ndb.StringProperty()
 
-    #decorator function allows us to call a function on a Class rather than an instance of it
-    @classmethod
-    def by_id(cls, uid):
-        return User.get_by_id(uid, parent=helpers.users_key())
-
     @classmethod
     def by_name(cls, name):
         return cls.query(cls.name == name).get()

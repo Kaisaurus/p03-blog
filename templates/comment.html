@@ -8,7 +8,7 @@
       {{ c.last_modified.strftime("%b %d, %Y - %H:%M") }}
     </small>
     <p>
-      {% if c.username == current_user %}
+      {% if c.user_name == user_name %}
         <a href="#" class="edit-comment ">
         Edit
         </a>

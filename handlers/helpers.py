@@ -7,31 +7,29 @@ import random
 import string
 import hashlib
 
+from string import letters
 from google.appengine.ext import ndb
 from handlers.secret import SECRET
 
-template_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
-jinja_env = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(template_dir),
-    autoescape=True)
-
-# Regular expressions to verify input
-USER_RE = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
-PASS_RE = re.compile(r"^.{3,20}$")
-EMAIL_RE = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
-
-# Helper functions to verify input useing the above regular expressions
+# Helper functions to verify input useing regular expressions
 def valid_username(username):
-    return username and USER_RE.match(username)
+    user_re = re.compile(r"^[a-zA-Z0-9_-]{3,20}$")
+    return username and user_re.match(username)
 
 def valid_password(password):
-    return password and PASS_RE.match(password)
+    pass_re = re.compile(r"^.{3,20}$")
+    return password and pass_re.match(password)
 
 def valid_email(email):
-    return not email or EMAIL_RE.match(email)
+    email_re = re.compile(r'^[\S]+@[\S]+\.[\S]+$')
+    return not email or email_re.match(email)
 
 # renders a jinja template using the received parameters
 def render_str_jinja(template, **params):
+    template_dir = os.path.join(os.path.dirname(__file__), '..', 'templates')
+    jinja_env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(template_dir),
+        autoescape=True)
     t = jinja_env.get_template(template)
     return t.render(params)
 
@@ -69,7 +67,3 @@ def render_post(response, post):
 # renders the error page with a given error
 def error_page(handler, error):
     handler.render('error.html', error=error)
-
-# key for users database (groups can be used for future functionality)
-def users_key(group = 'default'):
-    return ndb.Key('users', group)
