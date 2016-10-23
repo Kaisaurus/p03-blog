@@ -4,7 +4,7 @@ import json
 
 from google.appengine.ext import ndb
 from models.post import Post
-from models.post import Comment
+from models.comment import Comment
 from handlers.bloghandler import BlogHandler
 from handlers import helpers
 
