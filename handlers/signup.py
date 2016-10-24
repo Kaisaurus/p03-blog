@@ -4,8 +4,12 @@ from handlers.bloghandler import BlogHandler
 from handlers import helpers
 from models.user import User
 
+
 # signup page handler
+
+
 class Signup(BlogHandler):
+
     def get(self):
         users = User.query().order(-User.created)
         self.render("signup-form.html", users=users)
@@ -18,9 +22,10 @@ class Signup(BlogHandler):
         self.verify = self.request.get('verify')
         self.email = self.request.get('email')
 
-        # save the username and email in parameters so these inputs dont reset when an error occurs.
-        params = dict(username = self.username,
-                        email = self.email)
+        # save the username and email in parameters so these inputs dont reset
+        # when an error occurs.
+        params = dict(username=self.username,
+                      email=self.email)
 
         if not helpers.valid_username(self.username):
             params['error_username'] = "That's not a valid username."
@@ -46,27 +51,37 @@ class Signup(BlogHandler):
         '''This is just a placeholder which does not get called'''
         raise NotImplementedError
 
-# this handles the actual registration
+
+# this handles the actual registration***
+
+
 class Register(Signup):
+
     '''This class handles the registration after validation'''
+
     def done(self):
         # This done method overrides the done() from Signup
         # make sure the user doesn't already exist
         u = User.by_name(self.username)
         if u:
             msg = 'That user already exists.'
-            self.render('signup-form.html', error_username = msg)
+            self.render('signup-form.html', error_username=msg)
         else:
             u = User.register(self.username, self.password, self.email)
             u.put()
             self.login_cookie(u)
             self.redirect('/welcome')
 
+
 # This handles the welcome page
+
+
 class Welcome(BlogHandler):
-    # render welcome page when singup is successful, if the cookie isnt set correctly it redirects to the signup page
+    # render welcome page when singup is successful, if the cookie isnt set
+    # correctly it redirects to the signup page
+
     def get(self):
         if self.user:
             self.render('welcome.html')
         else:
-            helpers.error_page(self, 'Login failed'+ str(self.msg))
+            helpers.error_page(self, 'Login failed')

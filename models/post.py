@@ -5,7 +5,22 @@ from models.comment import Comment
 from google.appengine.ext import ndb
 from handlers import helpers
 
+
 class Post(ndb.Model):
+
+    """
+    Post:
+        a blog post
+    Args:
+        subject     (int): subject of the post
+        user_name   (str): name of the user posting
+        content     (str): content of the post
+        liked_by    (str): list of user names the post is liked by
+        last_modified(dt): DateTime that the post is last modified on
+        created      (dt): DateTime that the post is created
+    Returns:
+        A Post ndb.Model
+    """
     subject = ndb.StringProperty(required=True)
     content = ndb.TextProperty(required=True)
     user_name = ndb.StringProperty(required=True)
@@ -13,11 +28,15 @@ class Post(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     last_modified = ndb.DateTimeProperty(auto_now_add=True)
 
-    # creates a function to render text in html replacing line breaks with <br> tags
+    # creates a function to render text in html replacing line breaks with
+    # <br> tags
     def render(self, user_name):
         self._render_text = self.content.replace('\n', '<br>')
         self.comments = Comment.by_post_id(self.key.id())
-        return helpers.render_str_jinja("post.html", p=self, user_name=user_name, comments=self.comments)
+        return helpers.render_str_jinja("post.html",
+                                        p=self,
+                                        user_name=user_name,
+                                        comments=self.comments)
 
     # return the amount of likes the post has received
     def count_likes(self):

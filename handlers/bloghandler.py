@@ -6,12 +6,15 @@ from handlers import helpers
 from models.user import User
 from models.post import Post
 
+
 class BlogHandler(webapp2.RequestHandler):
     # general write function taking parameters
+
     def write(self, *a, **params):
         self.response.out.write(*a, **params)
 
-    # render a page using jinja and passing the current user as 'user' param so it is avialable in all templates
+    # render a page using jinja and passing the current user as 'user' param
+    # so it is avialable in all templates
     def render(self, template, **params):
         if self.user:
             params['user_name'] = self.user.name
@@ -45,9 +48,10 @@ class BlogHandler(webapp2.RequestHandler):
         entries = e.fetch(n)
         return entries
 
-    #init function is run when initialising the app
+    # init function is run when initialising the app
     def initialize(self, *a, **kw):
         webapp2.RequestHandler.initialize(self, *a, **kw)
         uid = self.read_secure_cookie('user_id')
-        # if the user is set, makes it available to all children Classes by assigning it to attribute user
+        # if the user is set, makes it available to all children Classes by
+        # assigning it to attribute user
         self.user = uid and User.get_by_id(int(uid))

@@ -4,8 +4,11 @@ from handlers.bloghandler import BlogHandler
 from models.user import User
 
 # logs in
+
+
 class Login(BlogHandler):
     # renders the login form
+
     def get(self):
         self.render('login-form.html')
 
@@ -25,7 +28,10 @@ class Login(BlogHandler):
             self.render('login-form.html', error=msg)
 
 # logs out
+
+
 class Logout(BlogHandler):
+
     def get(self):
         # logs out using the function borrowed from BlogHandler
         self.logout()
